@@ -370,6 +370,7 @@ class HwVideoEncoder implements VideoEncoder {
                             : EncodedImage.FrameType.VideoFrameDelta;
                     EncodedImage.Builder builder = outputBuilders.poll();
                     if (builder == null) return;
+
                     builder.setBuffer(frameBuffer)
                             .setBufferInfo(info)
                             .setFrameType(frameType);
@@ -409,20 +410,6 @@ class HwVideoEncoder implements VideoEncoder {
         }
     }
 
-//    private VideoCodecStatus updateBitrate() {
-//        outputThreadChecker.checkIsOnValidThread();
-//        adjustedBitrate = bitrateAdjuster.getAdjustedBitrateBps();
-//        try {
-//            Bundle params = new Bundle();
-//            params.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, adjustedBitrate);
-//            codec.setParameters(params);
-//            return VideoCodecStatus.OK;
-//        } catch (IllegalStateException e) {
-//            ELog.e(TAG, "updateBitrate failed:" + e.getLocalizedMessage());
-//            return VideoCodecStatus.ERROR;
-//        }
-//    }
-
     @Override
     public VideoCodecStatus deInit() {
         encodeThreadChecker.checkIsOnValidThread();
@@ -458,7 +445,6 @@ class HwVideoEncoder implements VideoEncoder {
         outputThread = null;
         // Allow changing thread after deInit.
         encodeThreadChecker.detachThread();
-
         return returnValue;
     }
 

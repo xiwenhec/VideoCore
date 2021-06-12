@@ -20,8 +20,4 @@ public abstract class IMediaMuxer implements VideoEncoder.VideoEncoderCallback,
             this.muteMic = muteMic;
         }
     }
-
-    abstract void release();
-
-
 }

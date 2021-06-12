@@ -3,6 +3,9 @@ package com.gpufast.recorder.video;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 
+import com.gpufast.utils.BufferUtil;
+import com.gpufast.utils.Util;
+
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
@@ -109,7 +112,7 @@ public class EncodedImage {
         }
 
         public Builder setBuffer(ByteBuffer buffer) {
-            this.buffer = buffer;
+            this.buffer = BufferUtil.clone(buffer);
             return this;
         }
 
@@ -160,7 +163,8 @@ public class EncodedImage {
          * @return
          */
         public Builder setBufferInfo(MediaCodec.BufferInfo bufferInfo) {
-            this.bufferInfo = bufferInfo;
+            this.bufferInfo = new MediaCodec.BufferInfo();
+            this.bufferInfo.set(bufferInfo.offset,bufferInfo.size,bufferInfo.presentationTimeUs,bufferInfo.flags);
             return this;
         }
 
