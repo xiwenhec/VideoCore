@@ -215,6 +215,4 @@ public class CanvasFilter {
             bitmapBoard = null;
         }
     }
-
-
 }

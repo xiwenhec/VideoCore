@@ -8,12 +8,8 @@ import android.view.SurfaceView;
  * Description:
  */
 public class EffectSurfaceView extends SurfaceView {
-
-
     public EffectSurfaceView(Context context) {
         super(context);
     }
-
-
 
 }

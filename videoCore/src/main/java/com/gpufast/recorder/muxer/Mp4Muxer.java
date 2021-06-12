@@ -19,24 +19,25 @@ public class Mp4Muxer extends IMediaMuxer {
     private static final String TAG = Mp4Muxer.class.getSimpleName();
 
     private final InnerMuxer mInnerMuxer;
+    private final MediaResource mMediaResource;
+    private final MuxerWorker mMuxerWorker;
+
     private volatile boolean videoTrackReady = false;
     private volatile boolean audioTrackReady = false;
     private boolean muteMic;  //是否禁止录制音频
-    private MediaResource mMediaResource;
-    private MuxerWorker mMuxerWorker;
 
     Mp4Muxer(Setting setting) {
-        if (setting == null)
+        if (setting == null) {
             throw new IllegalArgumentException("setting is null object");
+        }
         mInnerMuxer = new InnerMuxer(setting.savePath);
+        mMediaResource = new MediaResource();
+        mMuxerWorker = new MuxerWorker(mInnerMuxer,mMediaResource);
         initMuxer(setting);
     }
 
     private void initMuxer(Setting setting) {
         muteMic = setting.muteMic;
-        muteMic = false;
-        mMediaResource = new MediaResource();
-        mMuxerWorker = new MuxerWorker(mInnerMuxer,mMediaResource);
     }
 
 
@@ -44,8 +45,8 @@ public class Mp4Muxer extends IMediaMuxer {
     public void onUpdateAudioMediaFormat(MediaFormat mediaFormat) {
         if (audioTrackReady || muteMic) return;
         ELog.i(TAG, "onUpdateAudioMediaFormat" + mediaFormat);
-        boolean suc = mInnerMuxer.addAudioTrack(mediaFormat);
-        if (!suc) {
+        boolean success = mInnerMuxer.addAudioTrack(mediaFormat);
+        if (!success) {
             ELog.e(TAG, "Add audio track failed");
             return;
         }
@@ -61,8 +62,8 @@ public class Mp4Muxer extends IMediaMuxer {
     public void onUpdateVideoMediaFormat(MediaFormat mediaFormat) {
         if (videoTrackReady) return;
         ELog.i(TAG, "onUpdateVideoMediaFormat" + mediaFormat);
-        boolean suc = mInnerMuxer.addVideoTrack(mediaFormat);
-        if (!suc) {
+        boolean success = mInnerMuxer.addVideoTrack(mediaFormat);
+        if (!success) {
             ELog.e(TAG, "Add video track failed");
             return;
         }
@@ -160,7 +161,10 @@ public class Mp4Muxer extends IMediaMuxer {
             mInnerMuxer.release();
         }
     }
+
+
     static class MediaResource {
+
         private final LinkedBlockingQueue<EncodedImage> videoQueue;
         private final LinkedBlockingQueue<EncodedAudio> audioQueue;
 
@@ -187,6 +191,7 @@ public class Mp4Muxer extends IMediaMuxer {
     }
 
     static class InnerMuxer {
+
         private MediaMuxer mediaMuxer;
         private int audioTrackIndex = -1;
         private int videoTrackIndex = -1;
