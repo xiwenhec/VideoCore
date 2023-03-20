@@ -4,12 +4,11 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion = rootProject.ext.buildToolsVersion
     defaultConfig {
-        applicationId "com.gpufast.effectcamera"
+        applicationId "com.sivin.vdcoredemo"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -22,6 +21,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    namespace 'com.sivin.vdcoredemo'
 }
 
 dependencies {
