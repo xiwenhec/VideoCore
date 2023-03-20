@@ -43,7 +43,6 @@ public class AudioSetting {
             channelConfig = AudioFormat.CHANNEL_IN_STEREO;
         }
         this.audioFormat = audioFormat;
-
         inputBufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat) * 2;
     }
 

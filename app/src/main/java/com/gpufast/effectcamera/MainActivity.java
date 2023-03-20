@@ -16,8 +16,6 @@ import com.tbruyelle.rxpermissions3.RxPermissions;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MainActivity";
     private Button mStartCameraBtn;
-    private RxPermissions rxPermissions;
-    private int grantNum = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void initData() {
-        rxPermissions = new RxPermissions(this);
     }
 
     private void initView() {
@@ -48,30 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startCameraActivity();
                 break;
         }
-
     }
 
     @SuppressLint("CheckResult")
     private void startCameraActivity() {
-        grantNum = 0;
-        rxPermissions.requestEach(Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        ).subscribe(permission -> {
-            if (permission.granted) {
-                ELog.i(TAG, "permission granted:" + permission.name);
-                grantNum++;
-                if (grantNum == 4) {
-                    ELog.i(TAG, "all permission is granted:");
-                    Intent intent = new Intent(MainActivity.this, RecorderActivity.class);
-                    startActivity(intent);
-                }
-            } else if (permission.shouldShowRequestPermissionRationale) {
-
-            } else {
-
-            }
-        });
+        Intent intent = new Intent(MainActivity.this, RecorderActivity.class);
+        startActivity(intent);
     }
 }

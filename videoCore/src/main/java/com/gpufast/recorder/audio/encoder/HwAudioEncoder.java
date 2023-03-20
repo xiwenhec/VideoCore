@@ -103,7 +103,7 @@ public class HwAudioEncoder implements AudioEncoder {
     @Override
     public void encode(AudioFrame frame) {
         checker.checkIsOnValidThread();
-        int inputBufferIndex = codec.dequeueInputBuffer(0);
+        int inputBufferIndex = codec.dequeueInputBuffer(-1);
         if (inputBufferIndex >= 0) {
             ByteBuffer inputBuffer = codec.getInputBuffer(inputBufferIndex);
             if (inputBuffer == null) {
@@ -113,8 +113,7 @@ public class HwAudioEncoder implements AudioEncoder {
             inputBuffer.clear();
             inputBuffer.put(frame.buf);
             inputBuffer.limit(frame.len);
-            codec.queueInputBuffer(
-                    inputBufferIndex, 0, frame.len, frame.timeStamp_us, 0);
+            codec.queueInputBuffer(inputBufferIndex, 0, frame.len, frame.timeStamp_us, 0);
         }
         int outputBufferIndex = codec.dequeueOutputBuffer(mBufferInfo, 0);
         while (outputBufferIndex >= 0) {

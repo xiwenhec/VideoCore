@@ -10,7 +10,6 @@ import java.nio.ByteBuffer;
 public class AudioCollector {
     private static final String TAG = "AudioCollector";
 
-
     private AudioRecord mAudioRecord;
 
     private AudioCollectThread collectThread;
@@ -66,14 +65,14 @@ public class AudioCollector {
         public void run() {
             //没有数据接收的地方，采集无意义
             if (callback == null || mAudioRecord == null) return;
-            long start = System.currentTimeMillis();
+            long start = System.nanoTime();
             //等待检测录音器启动录制是否成功
             mAudioRecord.startRecording();
             while (keepAlive) {
                 int state = mAudioRecord.getRecordingState();
                 if (state == AudioRecord.RECORDSTATE_STOPPED) {
-                    if (System.currentTimeMillis() - start < 500) {
-                        yield();
+                    if ((System.nanoTime() - start) < 500_000_000L) {
+                        Thread.yield();
                     } else {
                         //如果500毫秒内录音器未初始化成功，则放弃录音
                         synchronized (mStartLock) {
@@ -91,7 +90,8 @@ public class AudioCollector {
                 mReady = true;
                 mStartLock.notify();
             }
-
+            //保存pcm时打开
+//            MediaFileWriter writer = new MediaFileWriter("test/test.pcm");
             //------------------------开始读取麦克风数据------------------
             ByteBuffer buffer = ByteBuffer.allocateDirect(minBufferSize);
             start = System.nanoTime();
@@ -99,10 +99,14 @@ public class AudioCollector {
                 buffer.clear();
                 int num = mAudioRecord.read(buffer, buffer.limit());
                 if (num > 0) {
+                    //保存pcm时打开
+//                  writer.writePCMData(buffer,num);
+                    ELog.i("sendAudio", "num =" + num + " real=" + buffer.position());
                     callback.onReceiveAudioFrame(new AudioFrame(buffer, num, (System.nanoTime() - start) / 1000));
                 }
             }
-
+            //保存pcm时打开
+//             writer.close();
             //----------------开始停止录音---------------------------------
             if (mAudioRecord != null) {
                 mAudioRecord.stop();

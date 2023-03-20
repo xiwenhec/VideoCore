@@ -6,10 +6,9 @@ import android.media.MediaMuxer;
 import com.gpufast.logger.ELog;
 import com.gpufast.recorder.audio.EncodedAudio;
 import com.gpufast.recorder.video.EncodedImage;
-import com.gpufast.recorder.video.VideoFrame;
+import com.gpufast.utils.MediaFileWriter;
 
 import java.io.IOException;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -17,7 +16,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class Mp4Muxer extends IMediaMuxer {
     private static final String TAG = Mp4Muxer.class.getSimpleName();
-
     private final InnerMuxer mInnerMuxer;
     private final MediaResource mMediaResource;
     private final MuxerWorker mMuxerWorker;
@@ -26,18 +24,21 @@ public class Mp4Muxer extends IMediaMuxer {
     private volatile boolean audioTrackReady = false;
     private boolean muteMic;  //是否禁止录制音频
 
+    private MediaFileWriter mAACWriter;
+
     Mp4Muxer(Setting setting) {
         if (setting == null) {
             throw new IllegalArgumentException("setting is null object");
         }
         mInnerMuxer = new InnerMuxer(setting.savePath);
         mMediaResource = new MediaResource();
-        mMuxerWorker = new MuxerWorker(mInnerMuxer,mMediaResource);
+        mMuxerWorker = new MuxerWorker(mInnerMuxer, mMediaResource);
         initMuxer(setting);
     }
 
     private void initMuxer(Setting setting) {
         muteMic = setting.muteMic;
+//        mAACWriter = new MediaFileWriter("/test/testaac.aac");
     }
 
 
@@ -69,7 +70,7 @@ public class Mp4Muxer extends IMediaMuxer {
         }
         videoTrackReady = true;
         ELog.i(TAG, "video track has ready");
-        if(muteMic) {
+        if (muteMic) {
             mMuxerWorker.start();
             return;
         }
@@ -77,6 +78,7 @@ public class Mp4Muxer extends IMediaMuxer {
             mMuxerWorker.start();
         }
     }
+
     @Override
     public void onEncodedFrame(EncodedImage frame) {
         mMediaResource.putVideoFrame(frame);
@@ -84,6 +86,7 @@ public class Mp4Muxer extends IMediaMuxer {
 
     @Override
     public void onEncodedAudio(EncodedAudio frame) {
+       // mAACWriter.writeACCData(frame.buffer, frame.bufferInfo.size);
         if (!muteMic) {
             mMediaResource.putAudioFrame(frame);
         }
@@ -99,6 +102,7 @@ public class Mp4Muxer extends IMediaMuxer {
     public void onAudioEncoderStop() {
         ELog.i(TAG, "onAudioEncoderStop....");
         mMuxerWorker.stopFlag = true;
+//        mAACWriter.close();
     }
 
     static class MuxerWorker extends Thread {
@@ -107,7 +111,7 @@ public class Mp4Muxer extends IMediaMuxer {
         private final InnerMuxer mInnerMuxer;
         private final MediaResource mediaResource;
 
-        MuxerWorker(InnerMuxer muxer,MediaResource resource) {
+        MuxerWorker(InnerMuxer muxer, MediaResource resource) {
             this.mInnerMuxer = muxer;
             mediaResource = resource;
         }
@@ -149,19 +153,19 @@ public class Mp4Muxer extends IMediaMuxer {
             while (haveData) {
                 EncodedAudio audioFrame = mediaResource.getAudioFrame();
                 EncodedImage videoFrame = mediaResource.getVideoFrame();
-                if(audioFrame == null && videoFrame == null) {
+                if (audioFrame == null && videoFrame == null) {
                     haveData = false;
                 }
                 mInnerMuxer.writeAudioData(audioFrame);
                 mInnerMuxer.writeVideoData(videoFrame);
             }
         }
+
         //muxer线程退出工作
         private void onMuxerExit() {
             mInnerMuxer.release();
         }
     }
-
 
     static class MediaResource {
 
@@ -170,7 +174,7 @@ public class Mp4Muxer extends IMediaMuxer {
 
         MediaResource() {
             videoQueue = new LinkedBlockingQueue<>(300);
-            audioQueue = new LinkedBlockingQueue<>(500);
+            audioQueue = new LinkedBlockingQueue<>(600);
         }
 
         public void putAudioFrame(EncodedAudio frame) {
@@ -191,11 +195,11 @@ public class Mp4Muxer extends IMediaMuxer {
     }
 
     static class InnerMuxer {
-
         private MediaMuxer mediaMuxer;
         private int audioTrackIndex = -1;
         private int videoTrackIndex = -1;
         private boolean started = false;
+
         public InnerMuxer(String savePath) {
             try {
                 mediaMuxer = new MediaMuxer(savePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
@@ -215,14 +219,14 @@ public class Mp4Muxer extends IMediaMuxer {
         }
 
         public void start() {
-            if(started) return;
+            if (started) return;
             started = true;
             mediaMuxer.start();
         }
 
         public void writeAudioData(EncodedAudio frame) {
             if (frame == null || audioTrackIndex < 0) return;
-            mediaMuxer.writeSampleData(audioTrackIndex,frame.buffer,frame.bufferInfo);
+            mediaMuxer.writeSampleData(audioTrackIndex, frame.buffer, frame.bufferInfo);
             ELog.i(TAG, "mux audio data，timeStamp:" + frame.bufferInfo.presentationTimeUs);
         }
 
@@ -232,9 +236,10 @@ public class Mp4Muxer extends IMediaMuxer {
             ELog.i(TAG, "mux video data, index=" + frame.index
                     + " timeStamp:" + frame.bufferInfo.presentationTimeUs);
         }
+
         public void release() {
             mediaMuxer.release();
-            ELog.i(TAG,"muxer release...");
+            ELog.i(TAG, "muxer release...");
         }
     }
 }

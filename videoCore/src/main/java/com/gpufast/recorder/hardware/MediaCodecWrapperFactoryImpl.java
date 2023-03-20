@@ -108,4 +108,8 @@ public class MediaCodecWrapperFactoryImpl implements MediaCodecWrapperFactory {
     public MediaCodecWrapper createByCodecName(String name) throws IOException {
         return new MediaCodecWrapperImpl(MediaCodec.createByCodecName(name));
     }
+    @Override
+    public MediaCodecWrapper createEncoderByType(String type) throws IOException {
+        return new MediaCodecWrapperImpl(MediaCodec.createEncoderByType(type));
+    }
 }

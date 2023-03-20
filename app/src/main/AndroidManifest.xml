@@ -7,7 +7,6 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
 
     <application
@@ -18,6 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".App"
+        android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
             <intent-filter>
