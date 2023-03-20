@@ -6,7 +6,7 @@ import com.sivin.videocore.recorder.RecordParams;
 
 public interface RecorderContract {
 
-    interface View{
+    interface View {
 
         //设置预览界面
         SurfaceView getPreview();
@@ -19,11 +19,9 @@ public interface RecorderContract {
 
         //结束录制回调
         void onRecorderFinish();
-
-
     }
 
-    interface Presenter{
+    interface Presenter {
 
         //切换摄像头
         void switchCamera();

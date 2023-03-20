@@ -17,9 +17,12 @@ public class MediaCodecUtils {
     public static final String INTEL_PREFIX = "OMX.Intel.";   //Intel
     public static final String NVIDIA_PREFIX = "OMX.Nvidia.";
     public static final String QCOM_PREFIX = "OMX.qcom."; //高通
+    public static final String QTI_PREFIX = "c2.qti."; //高通
     public static final String HISI_PREFIX = "OMX.hisi."; //海思处理器
+
+    public static final String GOOGLE_PREFIX = "OMX.google."; //谷歌软件实现
     //软件实现的编解码器
-    public static final String[] SOFTWARE_IMPLEMENTATION_PREFIXES = {"OMX.google.", "OMX.SEC."};
+    public static final String[] SOFTWARE_IMPLEMENTATION_PREFIXES = {GOOGLE_PREFIX, "OMX.SEC."};
     // NV12 color format supported by QCOM codec, but not declared in MediaCodec -
     // 高通处理器支持的NV12的颜色格式，但是MediaCodec中没有声明
     // see /hardware/qcom/media/mm-core/inc/OMX_QCOMExtns.h

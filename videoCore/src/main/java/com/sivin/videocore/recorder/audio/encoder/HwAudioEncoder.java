@@ -48,7 +48,7 @@ public class HwAudioEncoder implements AudioEncoder {
      */
     private AudioEncoderCallback encoderCallback;
 
-    private ThreadUtils.ThreadChecker checker;
+    private final ThreadUtils.ThreadChecker checker;
 
 
     HwAudioEncoder(MediaCodecWrapperFactory mediaCodecFactory,
@@ -78,7 +78,6 @@ public class HwAudioEncoder implements AudioEncoder {
                 " bitrate=" + settings.getBitrate() +
                 " sampleRate=" + settings.getSampleRate() +
                 " mimeType=" + codecType.mimeType());
-
         try {
             MediaFormat format = new MediaFormat();
             format.setString(MediaFormat.KEY_MIME, codecType.mimeType());
@@ -91,7 +90,7 @@ public class HwAudioEncoder implements AudioEncoder {
             codec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             codec.start();
         } catch (IllegalStateException e) {
-            ELog.e(TAG, "init failed:" + e.getLocalizedMessage());
+            ELog.e(TAG, "audioEncoder init failed:" + e.getLocalizedMessage());
             release();
             return AudioCodecStatus.FALLBACK_SOFTWARE;
         }

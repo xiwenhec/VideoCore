@@ -11,12 +11,11 @@ public class ELog {
     static final int INFO_LEVEL = 4;
     static final int VERBOSE_LEVEL = 5;
 
-    private static final String ELOG_TAG = "EffectLib:";
+    private static final String ELOG_TAG = "VideoCore:";
 
     private ELog() {
         throw new UnsupportedOperationException();
     }
-
 
     public static void e(Class<?> cls, String msg) {
         if (cls == null) return;
